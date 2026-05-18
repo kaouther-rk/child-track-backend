@@ -3,25 +3,28 @@ FROM php:8.2-cli
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
+    curl \
+    libsqlite3-dev \
+    sqlite3 \
     libzip-dev \
-    zip \
-    curl
+    zip
 
-RUN docker-php-ext-install zip
+RUN docker-php-ext-install pdo pdo_sqlite zip
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
-
-RUN cp .env.example .env || true
-
-RUN php artisan key:generate || true
-
+RUN mkdir -p database
 RUN touch database/database.sqlite
+
+RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+RUN cp .env.example .env
+
+RUN php artisan key:generate
 
 EXPOSE 10000
 
