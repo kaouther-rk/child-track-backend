@@ -22,7 +22,7 @@ RUN touch database/database.sqlite
 
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
-RUN cp .env.example .env
+RUN touch .env
 
 RUN php artisan key:generate
 
